@@ -20,3 +20,4 @@ $plugin->version   = 2013101400;        // The current plugin version (Date: YYY
 $plugin->requires  = 2012062510;        // Requires this Moodle version
 $plugin->component = 'filter_multilangsecond'; // Full name of the plugin (used for diagnostics)
 $plugin->release   = '1.0';
+$plugin->maturity = MATURITY_ALPHA;
