@@ -16,4 +16,4 @@
 
 $string['filtername'] = 'Multi-lingual Content';
 $string['mode'] = 'Non HTML syntax';
-$string['mode_desc'] = 'If this is set a non HTML syntax is used {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}. Othewise lang="XX" attribute of html tags is used to identify language &lt;p lang="en"&gt;English&lt;/p&gt;&lt;p lang="bg"&gt;Bulgarian&lt;/p&gt;.';
+$string['mode_desc'] = 'If this is set, a non HTML syntax is used {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}. Othewise lang="XX" attribute of html tags is used to identify language &lt;p lang="en"&gt;English&lt;/p&gt;&lt;p lang="bg"&gt;Bulgarian&lt;/p&gt;.';
