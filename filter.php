@@ -27,15 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 // This version is based on original multilang filter by Gaetan Frenoy,
 // rewritten by Eloy, skodak and vanyog.
 //
-// Changes made by Vanyo Georgiev <info@vanyog.com> 14-October-2013.
-// This filter has an admin setting filter_multilangsecond_mode. 
-// If this setting is set to true non html syntax can be used for multilang blocks like
-// {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}
-// Otherwise a language block is a serie of identical html tags with lang="XX" atributes:
+// Changes made by Vanyo Georgiev <info@vanyog.com> 23-March-2014 in version 1.1 of this filter:
+// The admin setting filter_multilangsecond_mode is a dropdown list with thee choices. 
+// If this setting is set to 0, html syntax is used for language blocks like:
 // <h1 lang="en">Heading in English</h1>
 // <h1 lang="bg">Heading in Bulgarian</h1>
 // The old syntax with <lang> tags is valid too.
-
+// If filter_multilangsecond_mode = 1, non HTML syntax is used:
+// {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}
+// and if filter_multilangsecond_mode = 2 the filter searches in the text twice,
+// first time for non html blocks and second time for html blocks.
+ 
 class filter_multilangsecond extends moodle_text_filter {
     public function filter($text, array $options = array()) {
         global $CFG;
@@ -44,10 +46,19 @@ class filter_multilangsecond extends moodle_text_filter {
             return $text;
         }
 
+	$search0 = '/<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*(?:<\1[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+/is';
+	
         if ($CFG->filter_multilangsecond_mode) $search = '/(?:\{mlang\s+[a-z0-9]+\}.*?\{mlang\}){2,}/is';
-        else $search = '/<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*(?:<\1[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+/is';
+        else $search = $search0;
 
         $result = preg_replace_callback($search, 'filter_multilangsecond_impl', $text);
+
+        if (is_null($result)) {
+            return $text; // Error during regex processing (too many nested spans?).
+        }
+
+	if ($CFG->filter_multilangsecond_mode > 1)
+		$result = preg_replace_callback($search0, 'filter_multilangsecond_impl2', $result);
 
         if (is_null($result)) {
             return $text; // Error during regex processing (too many nested spans?).
@@ -56,6 +67,8 @@ class filter_multilangsecond extends moodle_text_filter {
         }
     }
 }
+
+// Non HTML syntax
 
 function filter_multilangsecond_impl($langblock) {
     global $CFG;
@@ -72,21 +85,8 @@ function filter_multilangsecond_impl($langblock) {
         $parentlang = $parentcache[$mylang];
     }
 
-    if ($CFG->filter_multilangsecond_mode){
-        $searchtosplit = '/\{mlang\s+([a-z0-9]+)\}(.*?)\{mlang\}/is';
-        $ri = 2;
-    }
-    else {
-        // <span lang="XX"> tags are removed, but other tags are kept.
-        if ($langblock[1]=='span'){
-            $searchtosplit = '/<(?:'.$langblock[1].')[^>]+lang="([a-zA-Z0-9_-]+)"[^>]*>(.*?)<\/'.$langblock[1].'>/is';
-            $ri = 2;
-        }
-        else{
-            $searchtosplit = '/<(?:'.$langblock[1].')[^>]+lang="([a-zA-Z0-9_-]+)"[^>]*>.*?<\/'.$langblock[1].'>/is';
-            $ri = 0;
-        }
-    }
+    $searchtosplit = '/\{mlang\s+([a-z0-9]+)\}(.*?)\{mlang\}/is';
+    $ri = 2;
 
     if (!preg_match_all($searchtosplit, $langblock[0], $rawlanglist)) {
         // Skip malformed blocks.
@@ -96,9 +96,7 @@ function filter_multilangsecond_impl($langblock) {
     $langlist = array();
     foreach ($rawlanglist[1] as $index => $lang) {
         $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.
-        // Skip lang attributes set by OpenOffice writer.
-        if (isset($langlist[$lang])) return $langblock[0];
-        $langlist[$lang] = $rawlanglist[$ri][$index];
+        $langlist[$lang] .= $rawlanglist[$ri][$index];
     }
 
     if (array_key_exists($mylang, $langlist)) {
@@ -111,4 +109,50 @@ function filter_multilangsecond_impl($langblock) {
     }
 }
 
+// HTML syntax
 
+function filter_multilangsecond_impl2($langblock) {
+    global $CFG;
+
+    $mylang = current_language();
+    static $parentcache;
+    if (!isset($parentcache)) {
+        $parentcache = array();
+    }
+    if (!array_key_exists($mylang, $parentcache)) {
+        $parentlang = get_parent_language($mylang);
+        $parentcache[$mylang] = $parentlang;
+    } else {
+        $parentlang = $parentcache[$mylang];
+    }
+
+    // <span lang="XX"> tags are removed, but other tags are kept.
+    if ($langblock[1]=='span'){
+        $searchtosplit = '/<(?:'.$langblock[1].')[^>]+lang="([a-zA-Z0-9_-]+)"[^>]*>(.*?)<\/'.$langblock[1].'>/is';
+        $ri = 2;
+    }
+    else{
+        $searchtosplit = '/<(?:'.$langblock[1].')[^>]+lang="([a-zA-Z0-9_-]+)"[^>]*>.*?<\/'.$langblock[1].'>/is';
+        $ri = 0;
+    }
+
+    if (!preg_match_all($searchtosplit, $langblock[0], $rawlanglist)) {
+        // Skip malformed blocks.
+        return $langblock[0];
+    }
+
+    $langlist = array();
+    foreach ($rawlanglist[1] as $index => $lang) {
+        $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.
+        $langlist[$lang] .= $rawlanglist[$ri][$index];
+    }
+
+    if (array_key_exists($mylang, $langlist)) {
+        return $langlist[$mylang];
+    } else if (array_key_exists($parentlang, $langlist)) {
+        return $langlist[$parentlang];
+    } else {
+        $first = array_shift($langlist);
+        return $first;
+    }
+}

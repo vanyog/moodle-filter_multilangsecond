@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['filtername'] = 'Multi-lingual Content';
-$string['mode'] = 'Non HTML syntax';
-$string['mode_desc'] = 'If this is set, a non HTML syntax is used {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}. Othewise lang="XX" attribute of html tags is used to identify language &lt;p lang="en"&gt;English&lt;/p&gt;&lt;p lang="bg"&gt;Bulgarian&lt;/p&gt;.';
+$string['filtername'] = 'Multilingual Content';
+$string['modenew'] = 'Syntax';
+$string['modenew_desc'] = 'By this setting you can choose the syntax: Non HTML syntax like {mlang en}English{mlang}{mlang bg}Bulgarian{mlang}; HTML syntax like &lt;p lang="en"&gt;English&lt;/p&gt;&lt;p lang="bg"&gt;Bulgarian&lt;/p&gt;; or Both. Note that if you choose Both the filter will work as two filters and the execution time will be twice longer.';
+$string['mode0'] = 'HTML';
+$string['mode1'] = 'Non HTML';
+$string['mode2'] = 'Both';
+
+
+
+
