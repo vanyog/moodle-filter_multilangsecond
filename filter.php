@@ -46,19 +46,26 @@ class filter_multilangsecond extends moodle_text_filter {
             return $text;
         }
 
-	$search0 = '/<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*(?:<\1[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+/is';
+        $search0 = '/<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*(?:<\1[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+/is';
+        $callback0 = 'filter_multilangsecond_impl2';
 	
-        if ($CFG->filter_multilangsecond_mode) $search = '/(?:\{mlang\s+[a-z0-9]+\}.*?\{mlang\}){2,}/is';
-        else $search = $search0;
+        if ($CFG->filter_multilangsecond_mode){
+            $search = '/(?:\{mlang\s+[a-z0-9]+\}.*?\{mlang\}){2,}/is';
+            $callback = 'filter_multilangsecond_impl';
+        }    
+        else {
+            $search = $search0;
+            $callback = $callback0;     
+        }
 
-        $result = preg_replace_callback($search, 'filter_multilangsecond_impl', $text);
+        $result = preg_replace_callback($search, $callback, $text);
 
         if (is_null($result)) {
             return $text; // Error during regex processing (too many nested spans?).
         }
 
 	if ($CFG->filter_multilangsecond_mode > 1)
-		$result = preg_replace_callback($search0, 'filter_multilangsecond_impl2', $result);
+		$result = preg_replace_callback($search0, $callback0, $result);
 
         if (is_null($result)) {
             return $text; // Error during regex processing (too many nested spans?).
