@@ -103,7 +103,10 @@ function filter_multilangsecond_impl($langblock) {
     $langlist = array();
     foreach ($rawlanglist[1] as $index => $lang) {
         $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.
-        $langlist[$lang] .= $rawlanglist[$ri][$index];
+        if (isset($langlist[$lang]))
+           $langlist[$lang] .= $rawlanglist[$ri][$index];
+        else
+           $langlist[$lang] = $rawlanglist[$ri][$index]; 
     }
 
     if (array_key_exists($mylang, $langlist)) {
@@ -151,7 +154,10 @@ function filter_multilangsecond_impl2($langblock) {
     $langlist = array();
     foreach ($rawlanglist[1] as $index => $lang) {
         $lang = str_replace('-', '_', strtolower($lang)); // Normalize languages.
-        $langlist[$lang] .= $rawlanglist[$ri][$index];
+        if (isset($langlist[$lang]))
+           $langlist[$lang] .= $rawlanglist[$ri][$index];
+        else
+           $langlist[$lang] = $rawlanglist[$ri][$index]; 
     }
 
     if (array_key_exists($mylang, $langlist)) {
