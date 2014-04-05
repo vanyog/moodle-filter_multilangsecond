@@ -50,7 +50,7 @@ class filter_multilangsecond extends moodle_text_filter {
         $callback0 = 'filter_multilangsecond_impl2';
 	
         if ($CFG->filter_multilangsecond_mode){
-            $search = '/(?:\{mlang\s+[a-z0-9]+\}.*?\{mlang\}){2,}/is';
+            $search = '/(?:\{mlang\s+[a-z0-9]+\}[^{]*\{mlang\}){2,}/is';
             $callback = 'filter_multilangsecond_impl';
         }    
         else {
