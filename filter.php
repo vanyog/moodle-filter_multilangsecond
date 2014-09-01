@@ -46,7 +46,7 @@ class filter_multilangsecond extends moodle_text_filter {
             return $text;
         }
 
-        $search0 = '/<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*(?:<\1[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+/is';
+        $search0 = '/(?:<([a-z0-9]+)[^>]*?lang=".*?".*?>.*?<\/\1>\s*)+<\1[^>]*?lang=".*?".*?>.*?<\/\1>/is';
         $callback0 = 'filter_multilangsecond_impl2';
 	
         if ($CFG->filter_multilangsecond_mode){
