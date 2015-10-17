@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 // rewritten by Eloy, skodak and vanyog.
 //
 // Changes made by Vanyo Georgiev <info@vanyog.com> 23-March-2014 in version 1.1 of this filter:
-// The admin setting filter_multilangsecond_mode is a dropdown list with thee choices. 
+// The admin setting filter_multilangsecond_mode is a dropdown list with three choices.
 // If this setting is set to 0, html syntax is used for language blocks like:
 // <h1 lang="en">Heading in English</h1>
 // <h1 lang="bg">Heading in Bulgarian</h1>
@@ -50,7 +50,7 @@ class filter_multilangsecond extends moodle_text_filter {
         $callback0 = 'filter_multilangsecond_impl2';
 	
         if ($CFG->filter_multilangsecond_mode){
-            $search = '/(?:\{mlang\s+[a-z0-9]+\}[^{]*\{mlang\}){2,}/is';
+            $search = '/(?:\{mlang\s+.+?\}[^{]*\{mlang\}){2,}/is';
             $callback = 'filter_multilangsecond_impl';
         }    
         else {
@@ -92,7 +92,7 @@ function filter_multilangsecond_impl($langblock) {
         $parentlang = $parentcache[$mylang];
     }
 
-    $searchtosplit = '/\{mlang\s+([a-z0-9]+)\}(.*?)\{mlang\}/is';
+    $searchtosplit = '/\{mlang\s+(.+?)\}(.*?)\{mlang\}/is';
     $ri = 2;
 
     if (!preg_match_all($searchtosplit, $langblock[0], $rawlanglist)) {
