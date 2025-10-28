@@ -16,8 +16,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015101700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012062510;        // Requires this Moodle version
+$plugin->version   = 2025042200;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2024100700;        // Requires this Moodle version
 $plugin->component = 'filter_multilangsecond'; // Full name of the plugin (used for diagnostics)
-$plugin->release   = '1.3';
+$plugin->release   = '1.4';
 $plugin->maturity = MATURITY_ALPHA;
